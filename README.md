@@ -11,3 +11,5 @@ Design and develop a relational database for a library. Write appropriate SQL st
 [MySQL Essential Training](https://www.lynda.com/MySQL-tutorials/MySQL-Essential-Training/139986-2.html)
 
 [Difference between "ON DELETE/UPDATE" MySQL](http://dba.stackexchange.com/questions/74627/difference-between-on-delete-cascade-on-update-cascade-in-mysql?answertab=votes#tab-top)
+
+[Working with Stored Procedures](https://dev.mysql.com/doc/connector-net/en/connector-net-tutorials-stored-procedures.html)
