@@ -22,10 +22,9 @@ When adding foreign keys then create the referenced table before the referencing
 errors or use alter the tables afterwards by adding constraints.
 */
 
-
 /*
-Password has type binary because one spot is 8-BITs and would fit a SHA-256 hash (32*8=256). 
-Optimally this should also include spaces for a salt, but it's not necessary for this exercise.
+Password has type binary because one spot is 8-BITs and would fit a SHA-256 hash (32*8=256). This 
+should also include space for a salt of a fixed binary length.
 */
 CREATE TABLE `users` (
     `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -34,6 +33,7 @@ CREATE TABLE `users` (
     `lastname`      varchar(100) NOT NULL,
     `email`         varchar(255) NOT NULL,
     `password`      binary(32) NOT NULL,
+    `verified`      tinyint(1) NOT NULL DEFAULT 0,
 
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
@@ -99,11 +99,11 @@ CREATE TABLE `genres` (
 );
 
 CREATE TABLE `authors` (
-    `id `           int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id`           int UNSIGNED NOT NULL AUTO_INCREMENT,
     `firstname`     varchar(100) NOT NULL,
     `lastname`      varchar(100) NOT NULL,
 
-    PRIMARY KEY (`id `)
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
 ALTER TABLE `books`
