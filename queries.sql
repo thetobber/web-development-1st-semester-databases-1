@@ -22,89 +22,89 @@ When adding foreign keys then create the referenced table before the referencing
 errors or use alter the tables afterwards by adding constraints.
 */
 
-CREATE TABLE `roles` (
-    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `role`          VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB;
 
 /*
 Password has type binary because one spot is 8-BITs and would fit a SHA-256 hash (32*8=256). 
 Optimally this should also include spaces for a salt, but it's not necessary for this exercise.
 */
 CREATE TABLE `users` (
-    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `role_id`       INT UNSIGNED NOT NULL,
-    `firstname`     VARCHAR(100) NOT NULL,
-    `lastname`      VARCHAR(100) NOT NULL,
-    `email`         VARCHAR(255) NOT NULL,
-    `password`      BINARY(32) NOT NULL,
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`role_id`)
-        REFERENCES `roles` (`id`)
-) ENGINE = InnoDB;
+    `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `role_id`       int UNSIGNED NOT NULL,
+    `firstname`     varchar(100) NOT NULL,
+    `lastname`      varchar(100) NOT NULL,
+    `email`         varchar(255) NOT NULL,
+    `password`      binary(32) NOT NULL,
 
-CREATE TABLE `publishers` (
-    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `publisher`     VARCHAR(100) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `books` (
-    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `publisher_id`  INT UNSIGNED NOT NULL,
-    `isbn`          VARCHAR(13) NOT NULL, #An ISBN code can be 10-13 characters long
-    `title`         VARCHAR(255) NOT NULL,
-    `description`   TEXT NULL,
-    `quantity`      INT UNSIGNED NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`) ,
-    FOREIGN KEY (`publisher_id`)
-        REFERENCES `publishers` (`id`)
+    `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `publisher_id`  int UNSIGNED NOT NULL,
+    `isbn`          varchar(13) NOT NULL, #An ISBN code can be 10-13 characters long
+    `title`         varchar(255) NOT NULL,
+    `description`   text NULL,
+    `quantity`      int UNSIGNED NOT NULL DEFAULT 0,
+
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
+CREATE TABLE `book_genres` (
+    `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `book_id`       int UNSIGNED NOT NULL,
+    `genre_id`      int UNSIGNED NOT NULL,
 
-/*
-Note to self:
-I should create a `book_genres` and `book_authors` table so that the genre and author 
-is not repeated multiple times for multiple books.
-*/
-
-CREATE TABLE `genres` (
-    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `book_id`       INT UNSIGNED NOT NULL,
-    `genre`         VARCHAR(100) NOT NULL,
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`book_id`)
-        REFERENCES `books` (`id`)
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
-CREATE TABLE `authors` (
-    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `book_id`       INT UNSIGNED NOT NULL,
-    `firstname`     VARCHAR(100) NOT NULL,
-    `lastname`      VARCHAR(100) NOT NULL,
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`book_id`)
-        REFERENCES `books` (`id`)
+CREATE TABLE `roles` (
+    `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `role`          varchar(50) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `publishers` (
+    `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `publisher`     varchar(100) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB;
+
+CREATE TABLE `book_authors` (
+    `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `book_id`       int UNSIGNED NOT NULL,
+    `author_id`     int UNSIGNED NOT NULL,
+
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE `rented` (
-    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `user_id`       INT UNSIGNED NOT NULL,
-    `book_id`       INT UNSIGNED NOT NULL,
-    `rent_date`     DATETIME NOT NULL ON UPDATE CURRENT_TIMESTAMP,
-    `return_date`   DATETIME NOT NULL,
-    `returned`      TINYINT NOT NULL DEFAULT 0,
-    PRIMARY KEY (`id`),
-    FOREIGN KEY (`user_id`)
-        REFERENCES `users` (`id`),
-        ON DELETE CASCADE
-    FOREIGN KEY (`book_id`)
-        REFERENCES `books` (`id`)
-        ON DELETE CASCADE
+    `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `user_id`       int UNSIGNED NOT NULL,
+    `book_id`       int UNSIGNED NOT NULL,
+    `rent_date`     datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP,
+    `return_date`   datetime NOT NULL,
+    `returned`      tinyint(1) NOT NULL DEFAULT 0,
+
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
-/*
+CREATE TABLE `genres` (
+    `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `genre`         varchar(100) NOT NULL,
+
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `authors` (
+    `id `           int UNSIGNED NOT NULL AUTO_INCREMENT,
+    `firstname`     varchar(100) NOT NULL,
+    `lastname`      varchar(100) NOT NULL,
+
+    PRIMARY KEY (`id `)
+) ENGINE = InnoDB;
+
 ALTER TABLE `books`
     ADD CONSTRAINT `books_publisher_id`
     FOREIGN KEY (`publisher_id`)
@@ -120,18 +120,35 @@ ALTER TABLE `rented`
     FOREIGN KEY (`book_id`)
     REFERENCES `books` (`id`);
 
-ALTER TABLE `genres`
-    ADD CONSTRAINT `genres_book_id`
+ALTER TABLE `book_genres`
+    ADD CONSTRAINT `book_genres_book_id`
     FOREIGN KEY (`book_id`)
-    REFERENCES `books` (`id`);
+    REFERENCES `books` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE;
 
-ALTER TABLE `authors`
-    ADD CONSTRAINT `authors_book_id`
+ALTER TABLE `book_authors`
+    ADD CONSTRAINT `book_authors_book_id`
     FOREIGN KEY (`book_id`)
-    REFERENCES `books` (`id`);
+    REFERENCES `books` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE;
 
 ALTER TABLE `users`
     ADD CONSTRAINT `users_role_id`
     FOREIGN KEY (`role_id`)
     REFERENCES `roles` (`id`);
-*/
+
+ALTER TABLE `book_genres`
+    ADD CONSTRAINT `book_genres_genre_id`
+    FOREIGN KEY (`genre_id`)
+    REFERENCES `genres` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE;
+
+ALTER TABLE `book_authors`
+    ADD CONSTRAINT `book_authors_author_id`
+    FOREIGN KEY (`author_id`)
+    REFERENCES `authors` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE;
