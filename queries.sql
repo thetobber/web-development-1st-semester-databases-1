@@ -38,6 +38,7 @@ CREATE TABLE `users` (
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
 
+
 CREATE TABLE `books` (
     `id`            int UNSIGNED NOT NULL AUTO_INCREMENT,
     `publisher_id`  int UNSIGNED NOT NULL,

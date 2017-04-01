@@ -6,6 +6,8 @@ Design and develop a relational database for a library. Write appropriate SQL st
 ### Resources
 [MySQL Documentation](https://dev.mysql.com/doc/)
 
+[MySQL 5.7 Reference Manual](https://dev.mysql.com/doc/refman/5.7/en/)
+
 [Foundations of Programming: Databases](https://www.lynda.com/Programming-Foundations-tutorials/Foundations-Programming-Databases/412845-2.html)
 
 [MySQL Essential Training](https://www.lynda.com/MySQL-tutorials/MySQL-Essential-Training/139986-2.html)
