@@ -1,5 +1,6 @@
 USE `library`;
 
+
 START TRANSACTION;
 
 #Inserting a book
@@ -35,6 +36,6 @@ INSERT INTO `users` VALUES
 SET @user_id = LAST_INSERT_ID();
 
 INSERT INTO `rented` (`user_id`, `book_id`) VALUES
-    ( @user_id, @book_id);
+    (@user_id, @book_id);
 
 COMMIT;

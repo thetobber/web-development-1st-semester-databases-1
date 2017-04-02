@@ -1,3 +1,6 @@
+DROP DATABASE IF EXISTS `library`;
+
+
 /*
 ENGINE = InnoDB is assigned on every table created because I'm not sure which version of 
 MySQL is in use. I know versions below 5.5.5 will default to the MyISAM engine.
@@ -14,6 +17,13 @@ CREATE DATABASE `library`
 
 
 USE `library`;
+
+
+DROP TRIGGER IF EXISTS `books_set_quantity`;
+DROP TRIGGER IF EXISTS `rented_set_rent_details`;
+DROP TRIGGER IF EXISTS `rented_update_book_quantity`;
+DROP TRIGGER IF EXISTS `rented_update_book_quantity`;
+DROP TRIGGER IF EXISTS `users_set_verified`;
 
 
 /*
@@ -146,6 +156,7 @@ CREATE TABLE `rented` (
         REFERENCES `books` (`id`)
 ) ENGINE = InnoDB;
 
+
 #Sets a default quantity of books for each record inseted
 CREATE TRIGGER `books_set_quantity`
     BEFORE INSERT ON `books` FOR EACH ROW SET
@@ -163,6 +174,12 @@ CREATE TRIGGER `rented_set_rent_details`
 CREATE TRIGGER `rented_update_book_quantity`
     AFTER INSERT ON `rented` FOR EACH ROW UPDATE
         `books` SET `quantity` = `quantity` - 1 WHERE `id` = NEW.`id`;
+
+
+#Increments quantity of a book for each rented record deleted
+CREATE TRIGGER `rented_delete_book_quantity`
+    AFTER DELETE ON `rented` FOR EACH ROW UPDATE
+        `books` SET `quantity` = `quantity` + 1 WHERE `id` = OLD.`id`;
 
 #Sets a default verified flag for each record inserted
 CREATE TRIGGER `users_set_verified`
