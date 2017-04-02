@@ -67,7 +67,7 @@ CREATE TABLE `users` (
     `lastname`      VARCHAR(100) NOT NULL,
     `email`         VARCHAR(255) NOT NULL,
     `password`      BINARY(32) NOT NULL,
-    `verified`      TINYINT(1) DEFAULT 0,
+    `verified`      TINYINT(1) NOT NULL,
 
     PRIMARY KEY (`id`),
 
@@ -82,7 +82,7 @@ CREATE TABLE `books` (
     `isbn`          VARCHAR(13) NOT NULL, #An ISBN code can be 10-13 characters long
     `title`         VARCHAR(255) NOT NULL,
     `description`   TEXT NULL,
-    `quantity`      INT UNSIGNED DEFAULT 0,
+    `quantity`      INT UNSIGNED NOT NULL,
 
     PRIMARY KEY (`id`),
 
@@ -135,7 +135,7 @@ CREATE TABLE `rented` (
     `book_id`       INT UNSIGNED NOT NULL,
     `rent_date`     DATETIME NOT NULL,
     `return_date`   DATETIME NOT NULL,
-    `returned`      TINYINT(1) DEFAULT 0,
+    `returned`      TINYINT(1) NOT NULL,
 
     PRIMARY KEY (`id`),
 
@@ -146,9 +146,25 @@ CREATE TABLE `rented` (
         REFERENCES `books` (`id`)
 ) ENGINE = InnoDB;
 
+#Sets a default quantity of books for each record inseted
+CREATE TRIGGER `books_set_quantity`
+    BEFORE INSERT ON `books` FOR EACH ROW SET
+        NEW.`quantity` = IFNULL(NEW.`quantity`, 0);
 
-#Sets the timespan of how long the book can be rented
-CREATE TRIGGER `rented_before_insert`
+
+#Sets the default dates and the returned flag for each record inserted
+CREATE TRIGGER `rented_set_rent_details`
     BEFORE INSERT ON `rented` FOR EACH ROW SET
         NEW.`rent_date` = NOW(),
-        NEW.`return_date` = NOW() + INTERVAL 7 DAY;
+        NEW.`return_date` = NOW() + INTERVAL 7 DAY,
+        NEW.`returned` = 0;
+
+#Decrements quantity of a book for each rented record inserted
+CREATE TRIGGER `rented_update_book_quantity`
+    AFTER INSERT ON `rented` FOR EACH ROW UPDATE
+        `books` SET `quantity` = `quantity` - 1 WHERE `id` = NEW.`id`;
+
+#Sets a default verified flag for each record inserted
+CREATE TRIGGER `users_set_verified`
+    BEFORE INSERT ON `users` FOR EACH ROW SET
+        NEW.`verified` = 0;
