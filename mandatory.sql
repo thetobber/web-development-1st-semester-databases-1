@@ -26,6 +26,8 @@ DROP PROCEDURE IF EXISTS `getUser`;
 DROP PROCEDURE IF EXISTS `getUsers`;
 DROP PROCEDURE IF EXISTS `getBook`;
 DROP PROCEDURE IF EXISTS `getBooks`;
+DROP PROCEDURE IF EXISTS `rentBook`;
+DROP PROCEDURE IF EXISTS `returnBook`;
 
 /*
 Note:
@@ -165,15 +167,15 @@ CREATE TRIGGER `rented_before_insert`
         NEW.`returned` = 0;
 
 #Decrements quantity of a book for each rented record inserted
-CREATE TRIGGER `rented_after_insert`
+/*CREATE TRIGGER `rented_after_insert`
     AFTER INSERT ON `rented` FOR EACH ROW UPDATE
-        `books` SET `quantity` = `quantity` - 1 WHERE `id` = NEW.`id`;
+        `books` SET `quantity` = `quantity` - 1 WHERE `id` = NEW.`id`;*/
 
 
 #Increments quantity of a book for each rented record deleted
-CREATE TRIGGER `rented_after_delete`
+/*CREATE TRIGGER `rented_after_delete`
     AFTER DELETE ON `rented` FOR EACH ROW UPDATE
-        `books` SET `quantity` = `quantity` + 1 WHERE `id` = OLD.`id`;
+        `books` SET `quantity` = `quantity` + 1 WHERE `id` = OLD.`id`;*/
 
 #Combines the users with a role
 CREATE VIEW `users_view` AS
@@ -228,6 +230,19 @@ END//
 CREATE PROCEDURE getBooks(limit1 INT, offset1 INT)
 BEGIN
     SELECT * FROM `books_view` LIMIT limit1 OFFSET offset1;
+END//
+
+CREATE PROCEDURE rentBook(uid INT, bid INT)
+BEGIN
+    INSERT INTO `rented` (`user_id`, `book_id`) VALUES (uid, bid);
+    UPDATE `books` SET `quantity` = `quantity` - 1 WHERE `id` = bid;
+END//
+
+CREATE PROCEDURE returnBook(uid INT)
+BEGIN
+    UPDATE `rented` SET `returned` = 1
+        WHERE `user_id` = uid AND `book_id` = bid;
+    UPDATE `books` SET `quantity` = `quantity` + 1 WHERE `id` = bid;
 END//
 DELIMITER ;
 
