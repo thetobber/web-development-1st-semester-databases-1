@@ -19,11 +19,10 @@ CREATE DATABASE `library`
 USE `library`;
 
 
-DROP TRIGGER IF EXISTS `books_set_quantity`;
-DROP TRIGGER IF EXISTS `rented_set_rent_details`;
-DROP TRIGGER IF EXISTS `rented_update_book_quantity`;
-DROP TRIGGER IF EXISTS `rented_update_book_quantity`;
-DROP TRIGGER IF EXISTS `users_set_verified`;
+DROP TRIGGER IF EXISTS `books_before_insert`;
+DROP TRIGGER IF EXISTS `rented_before_insert`;
+DROP TRIGGER IF EXISTS `rented_after_insert`;
+DROP TRIGGER IF EXISTS `rented_after_delete`;
 
 
 /*
@@ -77,7 +76,6 @@ CREATE TABLE `users` (
     `lastname`      VARCHAR(100) NOT NULL,
     `email`         VARCHAR(255) NOT NULL,
     `password`      BINARY(32) NOT NULL,
-    `verified`      TINYINT(1) NOT NULL,
 
     PRIMARY KEY (`id`),
 
@@ -158,30 +156,25 @@ CREATE TABLE `rented` (
 
 
 #Sets a default quantity of books for each record inseted
-CREATE TRIGGER `books_set_quantity`
+CREATE TRIGGER `books_before_insert`
     BEFORE INSERT ON `books` FOR EACH ROW SET
         NEW.`quantity` = IFNULL(NEW.`quantity`, 0);
 
 
 #Sets the default dates and the returned flag for each record inserted
-CREATE TRIGGER `rented_set_rent_details`
+CREATE TRIGGER `rented_before_insert`
     BEFORE INSERT ON `rented` FOR EACH ROW SET
         NEW.`rent_date` = NOW(),
         NEW.`return_date` = NOW() + INTERVAL 7 DAY,
         NEW.`returned` = 0;
 
 #Decrements quantity of a book for each rented record inserted
-CREATE TRIGGER `rented_update_book_quantity`
+CREATE TRIGGER `rented_after_insert`
     AFTER INSERT ON `rented` FOR EACH ROW UPDATE
         `books` SET `quantity` = `quantity` - 1 WHERE `id` = NEW.`id`;
 
 
 #Increments quantity of a book for each rented record deleted
-CREATE TRIGGER `rented_delete_book_quantity`
+CREATE TRIGGER `rented_after_delete`
     AFTER DELETE ON `rented` FOR EACH ROW UPDATE
         `books` SET `quantity` = `quantity` + 1 WHERE `id` = OLD.`id`;
-
-#Sets a default verified flag for each record inserted
-CREATE TRIGGER `users_set_verified`
-    BEFORE INSERT ON `users` FOR EACH ROW SET
-        NEW.`verified` = 0;
